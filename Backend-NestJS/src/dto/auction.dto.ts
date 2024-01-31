@@ -1,4 +1,5 @@
 export class UserDto {
+  id: string;
   username: string;
   email: string;
 
@@ -8,6 +9,7 @@ export class UserDto {
   }
 }
 export class AuctionDto {
+  id: string;
   brand: string;
   model: string;
   year: number;
@@ -36,6 +38,7 @@ export class AuctionDto {
 }
 
 export class BidDto {
+  id: string;
   amount: number;
   userId: string;
   auctionId: string;

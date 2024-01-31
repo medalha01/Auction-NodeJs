@@ -46,5 +46,4 @@ export const mockAuctions = [
     new Date('2024-07-25T17:30:00Z'),
     'user5',
   ),
-  // ... other mock auctions
 ];
