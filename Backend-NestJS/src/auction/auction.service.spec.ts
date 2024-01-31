@@ -3,6 +3,7 @@ import { AuctionsService } from './auction.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotFoundException } from '@nestjs/common';
 import { mockAuctions } from '../mocks/auction.mock';
+import { mockBids } from '../mocks/bid.mock';
 
 // Mock Prisma service
 const mockPrismaService = () => ({
@@ -103,4 +104,86 @@ describe('AuctionsService', () => {
       where: { id: auction.id },
     });
   });
+  it('should create a new bid', async () => {
+    const bidDto = mockBids[0];
+    const auction = mockAuctions.find((a) => a.id === bidDto.auctionId);
+    prisma.auction.findUnique.mockResolvedValue(auction);
+    jest.spyOn(prisma.auction, 'create').mockResolvedValue(bidDto);
+
+    const result = await service.createBid(bidDto);
+    expect(result).toEqual(bidDto);
+    expect(prisma.bid.create).toHaveBeenCalledWith({ data: bidDto });
+  });
+  // Assuming mockBids, mockAuctions, and service are already defined and set up
+
+  // 1. Ensure Bid is Not Lower Than the Current Highest Bid
+  it('should reject a bid lower than the current highest bid', async () => {
+    const bidDto = { ...mockBids[0], amount: 15000.0 }; // Lower than highest bid
+    const auctionId = bidDto.auctionId;
+    const highestBid = mockBids
+      .filter((b) => b.auctionId === auctionId)
+      .sort((a, b) => b.amount - a.amount)[0];
+
+    jest.spyOn(prisma.bid, 'findFirst').mockResolvedValue(highestBid);
+    jest
+      .spyOn(prisma.auction, 'findUnique')
+      .mockResolvedValue(mockAuctions.find((a) => a.id === auctionId));
+
+    await expect(service.createBid(bidDto)).rejects.toThrow(
+      'Bid amount must be higher than the current highest bid',
+    );
+  });
+
+  // 2. Validate Bidder's Eligibility
+  it('should reject a bid if the bidder is not eligible', async () => {
+    const ineligibleBidDto = { ...mockBids[0], bidderId: 'ineligibleBidder' };
+    jest
+      .spyOn(prisma.auction, 'findUnique')
+      .mockResolvedValue(
+        mockAuctions.find((a) => a.id === ineligibleBidDto.auctionId),
+      );
+
+    await expect(service.createBid(ineligibleBidDto)).rejects.toThrow(
+      'Bidder is not eligible',
+    );
+  });
+
+  // 3. Verify Auction Availability Before Bidding
+  it('should reject a bid if the auction is closed', async () => {
+    const bidDto = mockBids[0];
+    const closedAuction = {
+      ...mockAuctions.find((a) => a.id === bidDto.auctionId),
+      status: 'closed',
+    };
+    jest.spyOn(prisma.auction, 'findUnique').mockResolvedValue(closedAuction);
+
+    await expect(service.createBid(bidDto)).rejects.toThrow(
+      'Auction is not open for bidding',
+    );
+  });
+
+  // 4. Test Retrieval of All Bids for a Specific Auction
+  it('should retrieve all bids for a specific auction', async () => {
+    const auctionId = '1';
+    const auctionBids = mockBids.filter((bid) => bid.auctionId === auctionId);
+    jest.spyOn(prisma.bid, 'findMany').mockResolvedValue(auctionBids);
+
+    const retrievedBids = await service.findBidsByAuctionId(auctionId);
+    expect(retrievedBids).toEqual(auctionBids);
+    expect(prisma.bid.findMany).toHaveBeenCalledWith({ where: { auctionId } });
+  });
+
+  // 5. Test Retrieval of Bids by Bidder ID
+  it('should retrieve all bids made by a specific bidder', async () => {
+    const bidderId = 'bidder1';
+    const bidderBids = mockBids.filter((bid) => bid.id === bidderId);
+    jest.spyOn(prisma.bid, 'findMany').mockResolvedValue(bidderBids);
+
+    const retrievedBids = await service.findAllBidsByBidder(bidderId);
+    expect(retrievedBids).toEqual(bidderBids);
+    expect(prisma.bid.findMany).toHaveBeenCalledWith({ where: { bidderId } });
+  });
+
+  // Additional test cases (6-10) follow similar patterns, mocking the Prisma service,
+  // calling the service method, and asserting the expected outcome.
 });
