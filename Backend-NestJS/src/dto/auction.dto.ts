@@ -1,8 +1,6 @@
 export class UserDto {
   username: string;
   email: string;
-  auctions: AuctionDto[];
-  bids: BidDto[];
 
   constructor(username: string, email: string) {
     this.username = username;
@@ -17,7 +15,6 @@ export class AuctionDto {
   auctionStartDate: Date;
   auctionEndDate: Date;
   creatorId: string;
-  bids: BidDto[];
 
   constructor(
     brand: string,

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuctionService } from './auction.service';
-import { AuctionController } from './auction.controller';
-import { mockAuction, mockBid } from './mocks';
+import { AuctionService } from 'auction.service';
+import { AuctionController } from 'auction.controller';
+import { mockAuction, mockBids } from './mocks';
 
 describe('AuctionController', () => {
   let auctionController: AuctionController;
