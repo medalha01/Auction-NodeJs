@@ -11,6 +11,7 @@ const mockPrismaService = () => ({
     create: jest.fn(),
     findMany: jest.fn(),
     findUnique: jest.fn(),
+    findFirst: jest.fn(),
     update: jest.fn(),
     delete: jest.fn(),
   },
@@ -20,6 +21,7 @@ const mockPrismaService = () => ({
     update: jest.fn(),
     delete: jest.fn(),
     findMany: jest.fn(),
+    findFirst: jest.fn(),
     aggregate: jest.fn(),
   },
 });
@@ -136,7 +138,9 @@ describe('AuctionsService', () => {
 
   // 2. Validate Bidder's Eligibility
   it('should reject a bid if the bidder is not eligible', async () => {
-    const ineligibleBidDto = { ...mockBids[0], userId: 'ineligibleBidder' };
+    const auctionId = mockBids[0].auctionId;
+    const auction = mockAuctions.find((a) => a.id === auctionId);
+    const ineligibleBidDto = { ...mockBids[0], userId: auction.creatorId };
     jest
       .spyOn(prisma.auction, 'findUnique')
       .mockResolvedValue(
@@ -150,7 +154,7 @@ describe('AuctionsService', () => {
 
   // 3. Verify Auction Availability Before Bidding
   it('should reject a bid if the auction is closed', async () => {
-    const bidDto = mockBids[0];
+    const bidDto = mockBids[2];
     const closedAuction = {
       ...mockAuctions.find((a) => a.id === bidDto.auctionId),
       status: 'closed',

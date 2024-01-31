@@ -63,16 +63,23 @@ export class AuctionsService {
   // Create a new bid
   async createBid(bidDto: BidDto) {
     const auction = await this.findAuctionById(bidDto.auctionId);
-    if (auction.auctionEndDate < new Date()) {
+    if (auction.creatorId === bidDto.userId) {
+      throw new Error('Bidder is not eligible');
+    }
+    if (
+      auction.auctionEndDate < new Date() ||
+      auction.auctionStartDate > new Date()
+    ) {
       throw new Error('Auction is not open for bidding');
     }
     if (bidDto.amount <= auction.startingBid) {
       throw new Error('Bid amount must be greater than starting bid');
     }
     const highestBid = await this.findHighestBidByAuctionId(bidDto.auctionId);
-    if (bidDto.amount <= highestBid.amount) {
-      throw new Error('Bid amount must be greater than highest bid');
+    if (highestBid && bidDto.amount <= highestBid.amount) {
+      throw new Error('Bid amount must be higher than the current highest bid');
     }
+
     return this.prisma.bid.create({
       data: bidDto,
     });
