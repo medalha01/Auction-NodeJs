@@ -1,19 +1,6 @@
+import { BidDto } from '../dto/auction.dto';
 export const mockBids = [
-  {
-    id: '1',
-    amount: 15000.0,
-    userId: '1',
-    auctionId: '1',
-  },
-  {
-    id: '2',
-    amount: 16000.0,
-    userId: '2',
-    auctionId: '1',
-  },
-  {
-    id: '3',
-    amount: 27000.0,
-    userId: '3',
-  },
+  new BidDto(15000.0, '1', '1'),
+  new BidDto(16000.0, '2', '1'),
+  new BidDto(27000.0, '3', '2'),
 ];

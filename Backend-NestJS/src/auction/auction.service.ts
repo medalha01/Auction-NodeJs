@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuctionDto, BidDto } from '../dto/auction.dto';
 
@@ -6,115 +6,100 @@ import { AuctionDto, BidDto } from '../dto/auction.dto';
 export class AuctionsService {
   constructor(private prisma: PrismaService) {}
 
-  // Function to create a new auction
-  async create(auctionDto: AuctionDto) {
+  // Create a new auction
+  async createAuction(auctionDto: AuctionDto) {
     return this.prisma.auction.create({
       data: auctionDto,
     });
   }
 
-  // Function to find all auctions
-  async findAll() {
+  // Find all auctions
+  async findAllAuctions() {
     return this.prisma.auction.findMany();
   }
 
-  // Function to find an auction by its ID
-  async findById(id: string) {
-    return this.prisma.auction.findUnique({
+  // Find an auction by ID
+  async findAuctionById(id: string) {
+    const auction = await this.prisma.auction.findUnique({
       where: { id },
     });
+    if (!auction) {
+      throw new NotFoundException(`Auction with ID ${id} not found`);
+    }
+    return auction;
   }
 
-  // Function to find auctions by brand
-  async findByBrand(brand: string) {
-    return this.prisma.auction.findMany({
-      where: { brand },
-    });
-  }
-
-  // Function to find auctions by model
-  async findByModel(model: string) {
-    return this.prisma.auction.findMany({
-      where: { model },
-    });
-  }
-
-  // Function to find auctions by year
-  async findByYear(year: number) {
-    return this.prisma.auction.findMany({
-      where: { year },
-    });
-  }
-
-  // Function to find auctions by the ID of their creator
-  async findByCreatorId(creatorId: string) {
-    return this.prisma.auction.findMany({
-      where: { creatorId },
-    });
-  }
-
-  // Function to update an auction
+  // Update an auction
   async updateAuction(id: string, auctionDto: AuctionDto) {
+    const auction = await this.findAuctionById(id);
+    if (!auction) {
+      throw new NotFoundException(`Auction with ID ${id} not found`);
+    }
     return this.prisma.auction.update({
       where: { id },
       data: auctionDto,
     });
   }
 
-  // Function to delete an auction
+  // Delete an auction
   async deleteAuction(id: string) {
+    const auction = await this.findAuctionById(id);
+    if (!auction) {
+      throw new NotFoundException(`Auction with ID ${id} not found`);
+    }
     return this.prisma.auction.delete({
       where: { id },
     });
   }
-
-  // Function to create a new bid
-  async CreateBid(bidDto: BidDto) {
+  async findBidById(id: string) {
+    const bid = await this.prisma.bid.findUnique({
+      where: { id },
+    });
+    if (!bid) {
+      throw new NotFoundException(`Bid with ID ${id} not found`);
+    }
+    return bid;
+  }
+  // Create a new bid
+  async createBid(bidDto: BidDto) {
+    const auction = await this.findAuctionById(bidDto.auctionId);
+    if (bidDto.amount <= auction.startingBid) {
+      throw new Error('Bid amount must be greater than starting bid');
+    }
     return this.prisma.bid.create({
       data: bidDto,
     });
   }
 
-  // Function to find bids by auction ID
-  async FindBidsByAuctionId(auctionId: string) {
-    return this.prisma.bid.findMany({
-      where: { auctionId },
-    });
-  }
-
-  // Function to find bids by user ID
-  async FindBidsByUserId(userId: string) {
-    return this.prisma.bid.findMany({
-      where: { userId },
-    });
-  }
-
-  // Function to delete a bid
-  async deleteBid(id: string) {
-    return this.prisma.bid.delete({
-      where: { id },
-    });
-  }
-
-  // Function to update a bid
   async updateBid(id: string, bidDto: BidDto) {
+    const bid = await this.findBidById(id);
+    if (!bid) {
+      throw new NotFoundException(`Bid with ID ${id} not found`);
+    }
     return this.prisma.bid.update({
       where: { id },
       data: bidDto,
     });
   }
 
-  // Function to aggregate the total bid amount for an auction
-  async bidAmountByAuctionId(auctionId: string) {
-    return this.prisma.bid.aggregate({
-      _sum: {
-        amount: true,
-      },
+  async deleteBid(id: string) {
+    const bid = await this.findBidById(id);
+    if (!bid) {
+      throw new NotFoundException(`Bid with ID ${id} not found`);
+    }
+    return this.prisma.bid.delete({
+      where: { id },
+    });
+  }
+
+  // Find bids by auction ID
+  async findBidsByAuctionId(auctionId: string) {
+    return this.prisma.bid.findMany({
       where: { auctionId },
     });
   }
 
-  // Function to find the highest and lowest bids for an auction
+  // Find the highest bid for an auction
   async findHighestBidByAuctionId(auctionId: string) {
     return this.prisma.bid.findFirst({
       where: { auctionId },
@@ -122,28 +107,20 @@ export class AuctionsService {
     });
   }
 
-  async findLowestBidByAuctionId(auctionId: string) {
-    return this.prisma.bid.findFirst({
-      where: { auctionId },
-      orderBy: { amount: 'asc' },
-    });
-  }
-  // Function to find auctions ordered by their end date
-  async findOrderedAuctionsByDate() {
+  // Find auctions ordered by end date
+  async findAuctionsOrderedByEndDate() {
     return this.prisma.auction.findMany({
       orderBy: { auctionEndDate: 'asc' },
     });
   }
-  /*
-  async findWinningUserByAuctionId(auctionId: string) {
-    return this.prisma.user.findFirst({
-      where: {
-        bids: {
-          some: {
-            auctionId,
-          },
-        },
+
+  // Function to aggregate the total bid amount for an auction
+  async getTotalBidAmountByAuctionId(auctionId: string) {
+    return this.prisma.bid.aggregate({
+      _sum: {
+        amount: true,
       },
+      where: { auctionId },
     });
-    */
+  }
 }
