@@ -39,8 +39,6 @@ export class BidDto {
   amount: number;
   userId: string;
   auctionId: string;
-  auction: AuctionDto;
-  user: UserDto;
 
   constructor(amount: number, userId: string, auctionId: string) {
     this.amount = amount;
