@@ -60,9 +60,10 @@ export class AuctionsService {
     }
     return bid;
   }
-  // Create a new bid
-  async createBid(bidDto: BidDto) {
-    const auction = await this.findAuctionById(bidDto.auctionId);
+  async validateAuctionAndBid(auction, bidDto) {
+    if (!auction) {
+      throw new Error('Auction does not exist');
+    }
     if (auction.creatorId === bidDto.userId) {
       throw new Error('Bidder is not eligible');
     }
@@ -79,6 +80,12 @@ export class AuctionsService {
     if (highestBid && bidDto.amount <= highestBid.amount) {
       throw new Error('Bid amount must be higher than the current highest bid');
     }
+  }
+  // Create a new bid
+  async createBid(bidDto: BidDto) {
+    const auction = await this.findAuctionById(bidDto.auctionId);
+
+    await this.validateAuctionAndBid(auction, bidDto);
 
     return this.prisma.bid.create({
       data: bidDto,
@@ -86,19 +93,10 @@ export class AuctionsService {
   }
 
   async updateBid(id: string, bidDto: BidDto) {
-    const bid = await this.findBidById(id);
-    if (!bid) {
-      throw new NotFoundException(`Bid with ID ${id} not found`);
-    }
-    // Check if bid amount is greater than previous bid
-    if (bidDto.amount <= bid.amount) {
-      throw new Error('Bid amount must be greater than previous bid');
-    }
+    const auction = await this.findAuctionById(bidDto.auctionId);
+    await this.validateAuctionAndBid(auction, bidDto);
 
-    return this.prisma.bid.update({
-      where: { id },
-      data: bidDto,
-    });
+    return this.prisma.bid.create({ data: bidDto });
   }
 
   async deleteBid(id: string) {
