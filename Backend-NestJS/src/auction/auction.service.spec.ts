@@ -135,7 +135,7 @@ describe('AuctionsService', () => {
 
   // 2. Validate Bidder's Eligibility
   it('should reject a bid if the bidder is not eligible', async () => {
-    const ineligibleBidDto = { ...mockBids[0], bidderId: 'ineligibleBidder' };
+    const ineligibleBidDto = { ...mockBids[0], userId: 'ineligibleBidder' };
     jest
       .spyOn(prisma.auction, 'findUnique')
       .mockResolvedValue(
@@ -174,12 +174,12 @@ describe('AuctionsService', () => {
 
   // 5. Test Retrieval of Bids by Bidder ID
   it('should retrieve all bids made by a specific bidder', async () => {
-    const bidderId = 'bidder1';
-    const bidderBids = mockBids.filter((bid) => bid.id === bidderId);
+    const userId = 'bidder1';
+    const bidderBids = mockBids.filter((bid) => bid.id === userId);
     jest.spyOn(prisma.bid, 'findMany').mockResolvedValue(bidderBids);
 
-    const retrievedBids = await service.findAllBidsByBidder(bidderId);
+    const retrievedBids = await service.findAllBidsByBidder(userId);
     expect(retrievedBids).toEqual(bidderBids);
-    expect(prisma.bid.findMany).toHaveBeenCalledWith({ where: { bidderId } });
+    expect(prisma.bid.findMany).toHaveBeenCalledWith({ where: { userId } });
   });
 });
