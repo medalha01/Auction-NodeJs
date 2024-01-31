@@ -1,11 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuctionService } from 'auction.service';
-import { AuctionController } from 'auction.controller';
-import { mockAuction, mockBids } from './mocks';
+import { AuctionsService } from './auction.service';
+import { AuctionController } from './auction.controller';
+import { mockAuctions } from '../mocks/auction.mock';
+import { mockBids } from '../mocks/bid.mock';
 
 describe('AuctionController', () => {
   let auctionController: AuctionController;
-  let auctionService: AuctionService;
+  let auctionService: AuctionsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -16,6 +17,7 @@ describe('AuctionController', () => {
           useValue: {
             findAll: jest.fn().mockResolvedValue([mockAuction]),
             findOne: jest.fn().mockResolvedValue(mockAuction),
+            findFirst: jest.fn().mockResolvedValue(mockAuction),
             create: jest.fn().mockResolvedValue(mockAuction),
             update: jest
               .fn()

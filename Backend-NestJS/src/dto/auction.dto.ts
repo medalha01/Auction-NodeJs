@@ -3,9 +3,10 @@ export class UserDto {
   username: string;
   email: string;
 
-  constructor(username: string, email: string) {
+  constructor(username: string, email: string, id?: string) {
     this.username = username;
     this.email = email;
+    this.id = id;
   }
 }
 export class AuctionDto {
@@ -26,6 +27,7 @@ export class AuctionDto {
     auctionStartDate: Date,
     auctionEndDate: Date,
     creatorId: string,
+    id?: string,
   ) {
     this.brand = brand;
     this.model = model;
@@ -34,6 +36,7 @@ export class AuctionDto {
     this.auctionStartDate = auctionStartDate;
     this.auctionEndDate = auctionEndDate;
     this.creatorId = creatorId;
+    this.id = id;
   }
 }
 
@@ -43,9 +46,10 @@ export class BidDto {
   userId: string;
   auctionId: string;
 
-  constructor(amount: number, userId: string, auctionId: string) {
+  constructor(amount: number, userId: string, auctionId: string, id?: string) {
     this.amount = amount;
     this.userId = userId;
     this.auctionId = auctionId;
+    this.id = id;
   }
 }
