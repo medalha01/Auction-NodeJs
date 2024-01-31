@@ -107,8 +107,8 @@ describe('AuctionsService', () => {
   it('should create a new bid', async () => {
     const bidDto = mockBids[0];
     const auction = mockAuctions.find((a) => a.id === bidDto.auctionId);
-    prisma.auction.findUnique.mockResolvedValue(auction);
-    jest.spyOn(prisma.auction, 'create').mockResolvedValue(bidDto);
+    jest.spyOn(prisma.auction, 'findUnique').mockResolvedValue(auction);
+    jest.spyOn(prisma.bid, 'create').mockResolvedValue(bidDto);
 
     const result = await service.createBid(bidDto);
     expect(result).toEqual(bidDto);
