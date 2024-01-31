@@ -76,6 +76,11 @@ export class AuctionsService {
     if (!bid) {
       throw new NotFoundException(`Bid with ID ${id} not found`);
     }
+    // Check if bid amount is greater than previous bid
+    if (bidDto.amount >= bid.amount) {
+      throw new Error('Bid amount must be greater than previous bid');
+    }
+
     return this.prisma.bid.update({
       where: { id },
       data: bidDto,
@@ -121,6 +126,11 @@ export class AuctionsService {
         amount: true,
       },
       where: { auctionId },
+    });
+  }
+  async findAllBidsByBidder(userId: string) {
+    return this.prisma.bid.findMany({
+      where: { userId },
     });
   }
 }

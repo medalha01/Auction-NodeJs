@@ -114,7 +114,6 @@ describe('AuctionsService', () => {
     expect(result).toEqual(bidDto);
     expect(prisma.bid.create).toHaveBeenCalledWith({ data: bidDto });
   });
-  // Assuming mockBids, mockAuctions, and service are already defined and set up
 
   // 1. Ensure Bid is Not Lower Than the Current Highest Bid
   it('should reject a bid lower than the current highest bid', async () => {
@@ -183,7 +182,4 @@ describe('AuctionsService', () => {
     expect(retrievedBids).toEqual(bidderBids);
     expect(prisma.bid.findMany).toHaveBeenCalledWith({ where: { bidderId } });
   });
-
-  // Additional test cases (6-10) follow similar patterns, mocking the Prisma service,
-  // calling the service method, and asserting the expected outcome.
 });
