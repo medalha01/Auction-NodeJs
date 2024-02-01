@@ -1,27 +1,27 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuctionsService } from './auction.service';
-import { AuctionController } from './auction.controller';
+import { AuctionsController } from './auction.controller';
 import { mockAuctions } from '../mocks/auction.mock';
 import { mockBids } from '../mocks/bid.mock';
 
 describe('AuctionController', () => {
-  let auctionController: AuctionController;
+  let auctionController: AuctionsController;
   let auctionService: AuctionsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [AuctionController],
+      controllers: [AuctionsController],
       providers: [
         {
-          provide: AuctionService,
+          provide: AuctionsService,
           useValue: {
-            findAll: jest.fn().mockResolvedValue([mockAuction]),
-            findOne: jest.fn().mockResolvedValue(mockAuction),
-            findFirst: jest.fn().mockResolvedValue(mockAuction),
-            create: jest.fn().mockResolvedValue(mockAuction),
+            findAll: jest.fn().mockResolvedValue([mockAuctions]),
+            findOne: jest.fn().mockResolvedValue(mockAuctions),
+            findFirst: jest.fn().mockResolvedValue(mockAuctions),
+            create: jest.fn().mockResolvedValue(mockAuctions),
             update: jest
               .fn()
-              .mockResolvedValue({ ...mockAuction, startingBid: 11000.0 }),
+              .mockResolvedValue({ ...mockAuctions, startingBid: 11000.0 }),
             delete: jest.fn().mockResolvedValue(null),
             // Include other necessary methods
           },
@@ -30,8 +30,8 @@ describe('AuctionController', () => {
       ],
     }).compile();
 
-    auctionController = module.get<AuctionController>(AuctionController);
-    auctionService = module.get<AuctionService>(AuctionService);
+    auctionController = module.get<AuctionsController>(AuctionsController);
+    auctionService = module.get<AuctionsService>(AuctionsService);
   });
 
   // Test cases
@@ -40,18 +40,22 @@ describe('AuctionController', () => {
   });
 
   it('should get a list of auctions', async () => {
-    expect(await auctionController.findAll()).toEqual([mockAuction]);
-    expect(auctionService.findAll).toHaveBeenCalled();
+    expect(await auctionController.findAll()).toEqual(mockAuctions);
+    expect(auctionService.findAllAuctions).toHaveBeenCalled();
   });
 
   it('should get a single auction', async () => {
-    expect(await auctionController.findOne('1')).toEqual(mockAuction);
-    expect(auctionService.findOne).toHaveBeenCalledWith('1');
+    expect(await auctionController.findOneAuction('1')).toEqual(
+      mockAuctions[0],
+    );
+    expect(auctionService.findAuctionById).toHaveBeenCalledWith('1');
   });
 
   it('should create an auction', async () => {
-    expect(await auctionController.create(mockAuction)).toEqual(mockAuction);
-    expect(auctionService.create).toHaveBeenCalledWith(mockAuction);
+    expect(await auctionController.createAuction(mockAuctions[0])).toEqual(
+      mockAuctions[0],
+    );
+    expect(auctionService.createAuction).toHaveBeenCalledWith(mockAuctions);
   });
 
   // More test cases for updating, deleting, and handling bids
