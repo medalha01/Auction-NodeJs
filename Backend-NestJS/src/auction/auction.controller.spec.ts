@@ -2,8 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuctionsService } from './auction.service';
 import { AuctionsController } from './auction.controller';
 import { mockAuctions } from '../mocks/auction.mock';
-import { mockBids } from '../mocks/bid.mock';
 
+//TODO ADD Mock JWT AUTH
 describe('AuctionController', () => {
   let auctionController: AuctionsController;
   let auctionService: AuctionsService;
@@ -52,9 +52,12 @@ describe('AuctionController', () => {
   });
 
   it('should create an auction', async () => {
-    expect(await auctionController.createAuction(mockAuctions[0])).toEqual(
-      mockAuctions[0],
-    );
+    expect(
+      await auctionController.createAuction(
+        mockAuctions[0],
+        mockAuctions[0].creatorId,
+      ),
+    ).toEqual(mockAuctions[0]);
     expect(auctionService.createAuction).toHaveBeenCalledWith(mockAuctions);
   });
 
