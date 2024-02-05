@@ -7,11 +7,16 @@ export class AuctionsService {
   constructor(private prisma: PrismaService) {}
 
   // Create a new auction
-  async createAuction(auctionDto: AuctionDto, userId: string) {
+  async createAuction(auctionDto: AuctionDto) {
     return this.prisma.auction.create({
       data: {
-        ...auctionDto,
-        creatorId: userId,
+        auctionEndDate: auctionDto.auctionEndDate,
+        auctionStartDate: auctionDto.auctionStartDate,
+        brand: auctionDto.brand,
+        model: auctionDto.model,
+        year: auctionDto.year,
+        startingBid: auctionDto.startingBid,
+        creatorId: auctionDto.creatorId,
       },
     });
   }

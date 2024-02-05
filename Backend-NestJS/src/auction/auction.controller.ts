@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Get,
-  Param,
-  UseGuards,
-  Req,
-} from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, UseGuards } from '@nestjs/common';
 import { AuctionDto, BidDto } from '../dto/auction.dto';
 import { AuctionsService } from './auction.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -31,8 +23,8 @@ export class AuctionsController {
   })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiBody({ type: AuctionDto })
-  async createAuction(@Body() auctionObject: AuctionDto, @Req() req: any) {
-    return this.auctionsService.createAuction(auctionObject, req.user.userId);
+  async createAuction(@Body() auctionObject: AuctionDto) {
+    return this.auctionsService.createAuction(auctionObject);
   }
 
   @Get('auction/:id')
