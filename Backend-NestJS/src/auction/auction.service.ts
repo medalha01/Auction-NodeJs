@@ -31,6 +31,11 @@ export class AuctionsService {
     }
     return auction;
   }
+  async findAuctionByUserId(userId: string) {
+    return this.prisma.auction.findMany({
+      where: { creatorId: userId },
+    });
+  }
 
   // Update an auction
   async updateAuction(id: string, auctionDto: AuctionDto) {

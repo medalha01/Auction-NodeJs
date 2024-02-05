@@ -28,7 +28,7 @@ export const mockAuctions = [
     15000.0,
     new Date('2024-05-01T08:00:00Z'),
     new Date('2026-05-11T16:00:00Z'),
-    'user3',
+    'creator3',
     '3',
   ),
   new AuctionDto(
@@ -38,7 +38,7 @@ export const mockAuctions = [
     30000.0,
     new Date('2024-06-10T11:00:00Z'),
     new Date('2024-06-20T19:00:00Z'),
-    'user4',
+    'creator4',
     '4',
   ),
   new AuctionDto(
@@ -48,7 +48,7 @@ export const mockAuctions = [
     12000.0,
     new Date('2022-07-15T09:30:00Z'),
     new Date('2023-07-25T17:30:00Z'),
-    'user5',
+    'creator5',
     '5',
   ),
 ];
