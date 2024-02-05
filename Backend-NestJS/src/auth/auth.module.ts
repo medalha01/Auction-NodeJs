@@ -2,7 +2,7 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 import { PrismaService } from '../prisma/prisma.service';
 import { LocalStrategy } from './local.strategy';
@@ -16,7 +16,14 @@ import { LocalStrategy } from './local.strategy';
       signOptions: { expiresIn: '600s' }, // Set the expiration time for the JWT token
     }),
   ],
-  providers: [AuthService, PrismaService, JwtStrategy, LocalStrategy], // Provide the necessary services for the AuthModule
+  providers: [
+    AuthService,
+    PrismaService,
+    JwtStrategy,
+    LocalStrategy,
+    JwtService,
+  ], // Provide the necessary services for the AuthModule
   controllers: [AuthController], // Specify the controller for the AuthModule
+  exports: [AuthService, JwtService],
 })
 export class AuthModule {} // Define the AuthModule class

@@ -46,7 +46,9 @@ describe('AuctionsService', () => {
     const auctionDto = mockAuctions[0];
     jest.spyOn(prisma.auction, 'create').mockResolvedValue(auctionDto);
 
-    expect(await service.createAuction(auctionDto)).toEqual(auctionDto);
+    expect(await service.createAuction(auctionDto, auctionDto.id)).toEqual(
+      auctionDto,
+    );
     expect(prisma.auction.create).toHaveBeenCalledWith({ data: auctionDto });
   });
   // Test for finding all auctions

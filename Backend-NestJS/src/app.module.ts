@@ -1,3 +1,4 @@
+//
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -6,13 +7,22 @@ import { AuthModule } from './auth/auth.module';
 
 import { APP_GUARD } from '@nestjs/core';
 import { RateLimiterModule, RateLimiterGuard } from 'nestjs-rate-limiter';
+import { JwtService } from '@nestjs/jwt';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [AuthModule, RateLimiterModule],
+  imports: [
+    AuthModule,
+    RateLimiterModule,
+    ConfigModule.forRoot({ isGlobal: true }),
+  ],
   controllers: [AppController],
   providers: [
     AppService,
     PrismaService,
+    JwtAuthGuard,
+    JwtService,
     { provide: APP_GUARD, useClass: RateLimiterGuard },
   ],
 })
