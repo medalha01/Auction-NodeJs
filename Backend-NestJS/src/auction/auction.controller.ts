@@ -46,12 +46,6 @@ export class AuctionsController {
   @ApiResponse({ status: 200, description: 'The auctions details.' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiBody({ type: AuctionDto })
-  /**
-   * Retrieves an auction using the user ID.
-   *
-   * @param {string} id - The ID of the user
-   * @return {Promise<Auction>} The auction found for the user ID
-   */
   async getAuctionByUser(@Param('id') id: string) {
     return this.auctionsService.findAuctionByUserId(id);
   }
@@ -63,11 +57,6 @@ export class AuctionsController {
   @ApiResponse({ status: 200, description: 'The auctions details.' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiBody({ type: AuctionDto })
-  /**
-   * Find all items.
-   *
-   * @return {Promise} The list of all items.
-   */
   async findAll() {
     return this.auctionsService.findAllAuctions();
   }

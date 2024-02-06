@@ -90,6 +90,12 @@ export class AuctionsService {
     });
   }
 
+  /**
+   * Delete an auction by ID.
+   *
+   * @param {string} id - The ID of the auction to delete
+   * @return {Promise} The deleted auction
+   */
   async deleteAuction(id: string) {
     const auction = await this.findAuctionById(id);
     if (!auction) {
