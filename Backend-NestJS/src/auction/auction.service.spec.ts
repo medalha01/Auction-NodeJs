@@ -46,10 +46,18 @@ describe('AuctionsService', () => {
     const auctionDto = mockAuctions[0];
     jest.spyOn(prisma.auction, 'create').mockResolvedValue(auctionDto);
 
-    expect(await service.createAuction(auctionDto, auctionDto.id)).toEqual(
-      auctionDto,
-    );
-    expect(prisma.auction.create).toHaveBeenCalledWith({ data: auctionDto });
+    expect(await service.createAuction(auctionDto)).toEqual(auctionDto);
+    expect(prisma.auction.create).toHaveBeenCalledWith({
+      data: {
+        auctionEndDate: auctionDto.auctionEndDate,
+        auctionStartDate: auctionDto.auctionStartDate,
+        brand: auctionDto.brand,
+        model: auctionDto.model,
+        year: auctionDto.year,
+        startingBid: auctionDto.startingBid,
+        creatorId: auctionDto.creatorId,
+      },
+    });
   });
   // Test for finding all auctions
   it('should retrieve all auctions', async () => {
@@ -117,7 +125,13 @@ describe('AuctionsService', () => {
 
     const result = await service.createBid(bidDto);
     expect(result).toEqual(bidDto);
-    expect(prisma.bid.create).toHaveBeenCalledWith({ data: bidDto });
+    expect(prisma.bid.create).toHaveBeenCalledWith({
+      data: {
+        amount: bidDto.amount,
+        userId: bidDto.userId,
+        auctionId: bidDto.auctionId,
+      },
+    });
   });
 
   // 1. Ensure Bid is Not Lower Than the Current Highest Bid

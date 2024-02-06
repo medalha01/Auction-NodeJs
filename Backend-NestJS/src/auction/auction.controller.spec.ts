@@ -52,12 +52,9 @@ describe('AuctionController', () => {
   });
 
   it('should create an auction', async () => {
-    expect(
-      await auctionController.createAuction(
-        mockAuctions[0],
-        mockAuctions[0].creatorId,
-      ),
-    ).toEqual(mockAuctions[0]);
+    expect(await auctionController.createAuction(mockAuctions[0])).toEqual(
+      mockAuctions[0],
+    );
     expect(auctionService.createAuction).toHaveBeenCalledWith(mockAuctions);
   });
 

@@ -85,12 +85,19 @@ export class AuctionsController {
   @Post('bid')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a new bid' })
+  @ApiResponse({ status: 201, description: 'The bid has been created.' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
   async createBid(@Body() bidObject: BidDto) {
     return this.auctionsService.createBid(bidObject);
   }
 
   @Post('bid/update/:id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update a bid' })
+  @ApiResponse({ status: 200, description: 'The bid has been updated.' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
   async updateBid(@Param('id') id: string, @Body() updateBidDto: BidDto) {
     return this.auctionsService.updateBid(id, updateBidDto);
   }
