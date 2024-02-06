@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { mockJwtService } from './mocks/services.mock';
+import { JwtService } from '@nestjs/jwt';
 
 describe('AppController', () => {
   let appController: AppController;
@@ -8,15 +9,26 @@ describe('AppController', () => {
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [AppController],
-      providers: [AppService],
+      providers: [
+        {
+          provide: JwtService,
+          useFactory: mockJwtService,
+        },
+      ], // You may need to add the necessary providers here
     }).compile();
 
     appController = app.get<AppController>(AppController);
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+  describe('getProtectedRoute', () => {
+    it('should return a message and user information', () => {
+      const mockUser = {}; // Create a mock user object for testing
+      const mockRequest = { user: mockUser }; // Create a mock request object with the mock user
+      const result = appController.getProtectedRoute(mockRequest);
+      expect(result).toEqual({
+        message: 'You have accessed a protected route!',
+        user: mockUser,
+      });
     });
   });
 });

@@ -2,61 +2,57 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuctionsService } from './auction.service';
 import { AuctionsController } from './auction.controller';
 import { mockAuctions } from '../mocks/auction.mock';
+import { JwtService } from '@nestjs/jwt';
+import { mockJwtService, mockAuctionsService } from '../mocks/services.mock';
 
-//TODO ADD Mock JWT AUTH
-describe('AuctionController', () => {
-  let auctionController: AuctionsController;
-  let auctionService: AuctionsService;
+describe('AuctionsController', () => {
+  let auctionsController: AuctionsController;
+  let auctionsService: AuctionsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuctionsController],
       providers: [
+        AuctionsService,
         {
           provide: AuctionsService,
-          useValue: {
-            findAll: jest.fn().mockResolvedValue([mockAuctions]),
-            findOne: jest.fn().mockResolvedValue(mockAuctions),
-            findFirst: jest.fn().mockResolvedValue(mockAuctions),
-            create: jest.fn().mockResolvedValue(mockAuctions),
-            update: jest
-              .fn()
-              .mockResolvedValue({ ...mockAuctions, startingBid: 11000.0 }),
-            delete: jest.fn().mockResolvedValue(null),
-            // Include other necessary methods
-          },
+          useFactory: mockAuctionsService,
         },
-        // ... other providers if any
+        {
+          provide: JwtService,
+          useFactory: mockJwtService,
+        },
+        // Additional providers as needed
       ],
     }).compile();
 
-    auctionController = module.get<AuctionsController>(AuctionsController);
-    auctionService = module.get<AuctionsService>(AuctionsService);
+    auctionsController = module.get<AuctionsController>(AuctionsController);
+    auctionsService = module.get<AuctionsService>(AuctionsService);
   });
 
-  // Test cases
   it('should be defined', () => {
-    expect(auctionController).toBeDefined();
+    expect(auctionsController).toBeDefined();
+    expect(auctionsService).toBeDefined();
   });
 
   it('should get a list of auctions', async () => {
-    expect(await auctionController.findAll()).toEqual(mockAuctions);
-    expect(auctionService.findAllAuctions).toHaveBeenCalled();
+    await expect(auctionsController.findAll()).resolves.toEqual([mockAuctions]);
+    expect(auctionsService.findAllAuctions).toHaveBeenCalled();
   });
 
   it('should get a single auction', async () => {
-    expect(await auctionController.findOneAuction('1')).toEqual(
+    const auctionId = '1';
+    await expect(auctionsController.findOneAuction(auctionId)).resolves.toEqual(
       mockAuctions[0],
     );
-    expect(auctionService.findAuctionById).toHaveBeenCalledWith('1');
+    expect(auctionsService.findAuctionById).toHaveBeenCalledWith(auctionId);
   });
 
   it('should create an auction', async () => {
-    expect(await auctionController.createAuction(mockAuctions[0])).toEqual(
-      mockAuctions[0],
+    const newAuction = mockAuctions[0];
+    await expect(auctionsController.createAuction(newAuction)).resolves.toEqual(
+      newAuction,
     );
-    expect(auctionService.createAuction).toHaveBeenCalledWith(mockAuctions);
+    expect(auctionsService.createAuction).toHaveBeenCalledWith(newAuction);
   });
-
-  // More test cases for updating, deleting, and handling bids
 });

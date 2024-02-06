@@ -4,27 +4,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { NotFoundException } from '@nestjs/common';
 import { mockAuctions } from '../mocks/auction.mock';
 import { mockBids } from '../mocks/bid.mock';
-
-// Mock Prisma service
-const mockPrismaService = () => ({
-  auction: {
-    create: jest.fn(),
-    findMany: jest.fn(),
-    findUnique: jest.fn(),
-    findFirst: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-  },
-  bid: {
-    create: jest.fn(),
-    findUnique: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-    findMany: jest.fn(),
-    findFirst: jest.fn(),
-    aggregate: jest.fn(),
-  },
-});
+import { JwtService } from '@nestjs/jwt';
+import { mockJwtService, mockPrismaService } from '../mocks/services.mock';
 
 describe('AuctionsService', () => {
   let service: AuctionsService;
@@ -35,6 +16,7 @@ describe('AuctionsService', () => {
       providers: [
         AuctionsService,
         { provide: PrismaService, useFactory: mockPrismaService },
+        { provide: JwtService, useValue: mockJwtService },
       ],
     }).compile();
 

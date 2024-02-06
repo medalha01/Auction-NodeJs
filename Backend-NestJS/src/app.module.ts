@@ -8,7 +8,7 @@ import { AuctionsModule } from './auction/auction.module';
 
 import { APP_GUARD } from '@nestjs/core';
 import { RateLimiterModule, RateLimiterGuard } from 'nestjs-rate-limiter';
-import { JwtService } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 
 import { ConfigModule } from '@nestjs/config';
 import { AuthService } from './auth/auth.service';
@@ -17,6 +17,7 @@ import { AuthService } from './auth/auth.service';
   imports: [
     AuthModule,
     AuctionsModule,
+    JwtModule,
     RateLimiterModule,
     ConfigModule.forRoot({ isGlobal: true }),
   ],
