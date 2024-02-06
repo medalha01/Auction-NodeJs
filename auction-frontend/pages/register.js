@@ -1,14 +1,14 @@
 // Importing necessary React hooks and other utilities
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useRouter } from 'next/router';
-import PropTypes from 'prop-types';
+import React, { useState } from 'react'; // Import useState hook
+import axios from 'axios'; // Import axios
+import { useRouter } from 'next/router'; // Import useRouter hook
+import PropTypes from 'prop-types'; // Import PropTypes validation library
+import { apiClient } from '../utils/api';
 
 // Import CSS module for component-specific styling
-import styles from './Register.module.css';
+import styles from '../styles/Register.module.css';
 
 // Utilizing the environment variable for the API base URL in a secure manner
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 // Defining the Register functional component
 const Register = () => {
@@ -44,7 +44,11 @@ const Register = () => {
 
     try {
       // Attempt to register the user with the provided form data
-      await axios.post(`${API_BASE_URL}/auth/register`, formData);
+      await apiClient.post('/auth/register', {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
       alert('Registration successful'); // Inform user of successful registration
       router.push('/login'); // Redirect user to login page
     } catch (error) {

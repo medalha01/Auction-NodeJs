@@ -4,8 +4,6 @@ import { useRouter } from 'next/router';
 const Dashboard = () => {
   const router = useRouter();
 
-  // Simulate checking for authentication (e.g., checking for a token)
-  // This is a simplistic approach; you may want to use a more robust method.
 React.useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {

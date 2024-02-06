@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import styles from './Login.module.css'; // Import CSS module for styling
+import styles from '../styles/Login.module.css'; // Import CSS module for styling
 import { apiClient } from '../utils/api'; // Import the API client
 import { useRouter } from 'next/router'; // Import the router
 
+
 export default function Login() {
-  // State hooks for form inputs and error handling
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -26,10 +26,12 @@ export default function Login() {
 
       localStorage.setItem('token', token); // Store token in localStorage
       router.push('/dashboard'); // Navigate to dashboard on success
-      console.log('Login successful');
+      alert('Login successful');
+
     } catch (err) {
+      alert(err.response?.data?.message || 'An error occurred during login');
+
       setError(err.response?.data?.message || 'An error occurred during login');
-      console.error('Login failed:', err);
     } finally {
       setIsLoading(false);
     }
@@ -61,7 +63,7 @@ export default function Login() {
           />
         </div>
         {error && <div className={styles['error-message']}>{error}</div>}
-        <button type="submit" className={styles['login-button']} disabled={isLoading}>
+        <button type="submit" onClick = {handleLogin} className={styles['login-button']} disabled={isLoading}>
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
         <button type="button" onClick={() => router.push('/register')} className={styles['register-button']}>
