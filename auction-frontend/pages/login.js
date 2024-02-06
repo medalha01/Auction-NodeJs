@@ -10,7 +10,7 @@ export default function Login() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const navigate = useRouter(); // Hook for programmatic navigation
+  const router = useRouter(); // Hook for programmatic navigation
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -18,16 +18,18 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      const response = await apiClient.post('/api/auth/login', {
+      const response = await apiClient.post('/auth/login', {
         email,
         password,
       });
       const { token } = response.data;
 
       localStorage.setItem('token', token); // Store token in localStorage
-      navigate('/dashboard'); // Navigate to dashboard on success
+      router.push('/dashboard'); // Navigate to dashboard on success
+      console.log('Login successful');
     } catch (err) {
       setError(err.response?.data?.message || 'An error occurred during login');
+      console.error('Login failed:', err);
     } finally {
       setIsLoading(false);
     }
@@ -62,7 +64,7 @@ export default function Login() {
         <button type="submit" className={styles['login-button']} disabled={isLoading}>
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
-        <button type="button" onClick={() => navigate('/register')} className={styles['register-button']}>
+        <button type="button" onClick={() => router.push('/register')} className={styles['register-button']}>
           Register
         </button>
       </form>
