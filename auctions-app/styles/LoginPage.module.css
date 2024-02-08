@@ -1,0 +1,78 @@
+/* LoginPage.module.css */
+.login-page-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f2f5;
+    background-size: cover;
+    background-position: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .login-form {
+    padding: 40px;
+    background: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 16px;
+    color: #333333;
+  }
+  
+  .form-group-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Makes sure padding does not affect the overall width */
+  }
+  
+  .error-message {
+    color: #ff0000;
+    margin-bottom: 20px;
+  }
+  
+  .login-button, .register-button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .login-button {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .login-button:disabled {
+    background-color: #007bff;
+    opacity: 0.7;
+    cursor: default;
+  }
+  
+  .register-button {
+    background-color: #dddddd;
+    color: #333333;
+  }
+  
+  /* Add hover effects */
+  .login-button:hover:not(:disabled), .register-button:hover {
+    opacity: 0.9;
+  }
+  
