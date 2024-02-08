@@ -1,29 +1,52 @@
+// src/auth/jwt.strategy.ts
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
+import { Strategy, ExtractJwt } from 'passport-jwt';
 import { PrismaService } from '../prisma/prisma.service';
-
-// Decorate the JwtStrategy class with the Injectable decorator to make it injectable
+import { ConfigService } from '@nestjs/config';
+import { UserDto } from 'src/dto/auth.dto';
+/**
+ * Implements JWT authentication strategy using Passport and JWT.
+ * This strategy is responsible for validating JWT tokens in authorization headers
+ * and fetching the corresponding user from the database.
+ */
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
-  // Define a constructor that takes in an instance of the PrismaService class
-  constructor(private prisma: PrismaService) {
-    // Call the super constructor of the PassportStrategy class with the Strategy class as argument
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+  /**
+   * Initializes the JWT strategy with configuration options.
+   * @param prisma PrismaService for database access.
+   * @param configService ConfigService for accessing environment variables.
+   */
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly configService: ConfigService,
+  ) {
     super({
-      // Set the options for the JWT strategy
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: 'abc161981', // Replace with your secret key
+      secretOrKey: configService.get<string>('JWT_SECRET'),
     });
   }
 
-  // Define an asynchronous method called validate that takes in a payload of any type
-  async validate(payload: any) {
-    // Use the PrismaService to find a unique user based on the payload
+  /**
+   * Validates a JWT token's payload to authenticate a user.
+   * @param payload The JWT token payload.
+   * @returns The authenticated user or null if the user does not exist.
+   */
+  async validate(payload: {
+    sub: string;
+    email: string;
+  }): Promise<UserDto | null> {
     const user = await this.prisma.user.findUnique({
       where: { id: payload.sub },
     });
-    // Return the found user
-    return user;
+
+    if (!user) {
+      return null;
+    }
+
+    const userData = new UserDto(user.email, user.username, user.id);
+
+    return userData;
   }
 }
