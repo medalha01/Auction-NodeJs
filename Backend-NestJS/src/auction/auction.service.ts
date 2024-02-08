@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
+import { Auction } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuctionDto, BidDto } from '../dto/auction.dto';
 
@@ -7,104 +12,81 @@ export class AuctionsService {
   constructor(private prisma: PrismaService) {}
 
   /**
-   * createAuction - Creates a new auction with the provided details.
-   *
-   * @param {AuctionDto} auctionDto - the details of the auction to be created
-   * @return {Promise<Auction>} - the newly created auction
+   * Creates a new auction with the provided details, ensuring that the auction dates and starting bid are valid.
+   * @param auctionDto The DTO containing auction details.
+   * @returns The created auction without sensitive details.
    */
-  async createAuction(auctionDto: AuctionDto) {
-    if (
-      auctionDto.auctionEndDate < new Date() &&
-      auctionDto.auctionStartDate < new Date() &&
-      auctionDto.auctionEndDate < auctionDto.auctionStartDate
-    ) {
-      throw new Error('Auction date Invalid');
-    }
-    if (auctionDto.startingBid <= 0) {
-      throw new Error('Starting bid must be greater than 0');
-    }
-    return this.prisma.auction.create({
-      data: {
-        auctionEndDate: auctionDto.auctionEndDate,
-        auctionStartDate: auctionDto.auctionStartDate,
-        brand: auctionDto.brand,
-        model: auctionDto.model,
-        year: auctionDto.year,
-        startingBid: auctionDto.startingBid,
-        creatorId: auctionDto.creatorId,
-      },
-    });
-  }
+  async createAuction(auctionDto: AuctionDto): Promise<Auction> {
+    const { auctionEndDate, auctionStartDate, startingBid } = auctionDto;
 
+    if (auctionEndDate < new Date() || auctionEndDate < auctionStartDate) {
+      throw new BadRequestException('Invalid auction dates.');
+    }
+
+    if (startingBid <= 0) {
+      throw new BadRequestException('Starting bid must be greater than 0.');
+    }
+
+    return this.prisma.auction.create({ data: auctionDto });
+  }
   /**
    * Finds all auctions.
    *
    * @return {Promise<Auction[]>} The list of all auctions.
    */
-  async findAllAuctions() {
+  /**
+   * Retrieves all auctions.
+   * @returns An array of all auctions.
+   */
+  async findAllAuctions(): Promise<Auction[]> {
     return this.prisma.auction.findMany();
   }
 
   /**
-   * Asynchronously finds an auction by ID.
-   *
-   * @param {string} id - the ID of the auction
-   * @return {Promise<Auction>} the found auction
+   * Finds a single auction by its ID.
+   * @param id The ID of the auction to find.
+   * @returns The found auction.
+   * @throws NotFoundException if the auction doesn't exist.
    */
-  async findAuctionById(id: string) {
-    const auction = await this.prisma.auction.findUnique({
-      where: { id },
-    });
+  async findAuctionById(id: string): Promise<Auction> {
+    const auction = await this.prisma.auction.findUnique({ where: { id } });
     if (!auction) {
-      throw new NotFoundException(`Auction with ID ${id} not found`);
+      throw new NotFoundException(`Auction with ID ${id} not found.`);
     }
     return auction;
   }
+
   /**
-   * Find auction by user ID.
-   *
-   * @param {string} userId - The user ID to search for auctions.
-   * @return {Promise<Auction[]>} An array of auctions found.
+   * Finds auctions created by a specific user.
+   * @param userId The ID of the user whose auctions to find.
+   * @returns An array of auctions created by the user.
    */
-  async findAuctionByUserId(userId: string) {
-    return this.prisma.auction.findMany({
-      where: { creatorId: userId },
-    });
+  async findAuctionByUserId(userId: string): Promise<Auction[]> {
+    return this.prisma.auction.findMany({ where: { creatorId: userId } });
   }
 
   /**
-   * Update an auction by ID with the provided data.
-   *
-   * @param {string} id - The ID of the auction to update
-   * @param {AuctionDto} auctionDto - The data to update the auction with
-   * @return {Promise<Auction>} The updated auction
+   * Updates an auction by its ID with new details.
+   * @param id The ID of the auction to update.
+   * @param auctionDto New details to update the auction with.
+   * @returns The updated auction.
    */
-  async updateAuction(id: string, auctionDto: AuctionDto) {
-    const auction = await this.findAuctionById(id);
-    if (!auction) {
-      throw new NotFoundException(`Auction with ID ${id} not found`);
-    }
-    return this.prisma.auction.update({
-      where: { id },
-      data: auctionDto,
-    });
+  async updateAuction(id: string, auctionDto: AuctionDto): Promise<Auction> {
+    await this.findAuctionById(id); // Ensures auction exists and throws NotFoundException if not
+    return this.prisma.auction.update({ where: { id }, data: auctionDto });
   }
 
   /**
-   * Delete an auction by ID.
-   *
-   * @param {string} id - The ID of the auction to delete
-   * @return {Promise} The deleted auction
+   * Deletes an auction by its ID.
+   * @param id The ID of the auction to delete.
+   * @returns The result of the delete operation.
    */
-  async deleteAuction(id: string) {
-    const auction = await this.findAuctionById(id);
-    if (!auction) {
-      throw new NotFoundException(`Auction with ID ${id} not found`);
-    }
-    return this.prisma.auction.delete({
-      where: { id },
-    });
+  async deleteAuction(id: string): Promise<{ deleted: boolean }> {
+    await this.findAuctionById(id); // Ensures auction exists and throws NotFoundException if not
+    await this.prisma.auction.delete({ where: { id } });
+    return { deleted: true };
   }
+
   /**
    * Finds a bid by its ID.
    *
