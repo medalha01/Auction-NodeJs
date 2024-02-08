@@ -3,7 +3,7 @@ import { HttpException, Injectable, Logger, HttpStatus } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { RegisterDto, LoginDto } from '../dto/auth.dto';
+import { RegisterDto, LoginDto, UserDto } from '../dto/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -37,14 +37,15 @@ export class AuthService {
     return userWithoutPassword;
   }
 
-  async validateUser(loginDto: LoginDto): Promise<any> {
+  async validateUser(loginDto: LoginDto): Promise<UserDto> {
     const { email, password } = loginDto; // Add more tests for failure scenarios or edge cases
 
     const user = await this.getUser(email);
     if (user && (await bcrypt.compare(password, user.password))) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...result } = user;
-      return result;
+
+      const userData = new UserDto(user.email, user.username, user.id);
+      return userData;
     }
     return null;
   }

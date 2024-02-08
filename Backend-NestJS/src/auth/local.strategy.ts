@@ -3,31 +3,35 @@ import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto } from 'src/dto/auth.dto';
+import { LoginDto, UserDto } from 'src/dto/auth.dto';
 
+/**
+ * Implements authentication strategy using Passport's local strategy.
+ * This strategy is used for authenticating users based on email and password.
+ */
 @Injectable()
-export class LocalStrategy extends PassportStrategy(Strategy) {
+export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
+  /**
+   * Injects the AuthService to use its validateUser method for authentication.
+   * @param authService The authentication service to validate user credentials.
+   */
   constructor(private authService: AuthService) {
     super({ usernameField: 'email' });
   }
 
-  // Asynchronously validate the user's email and password
-  async validate(email: string, password: string): Promise<any> {
-    const userVal: LoginDto = { email, password }; // Assign the email and password to the user DTO
-    // Call the authService to validate the user with the provided email and password
-    const user = await this.authService.validateUser(userVal);
-    // If no user is found, throw an UnauthorizedException
+  /**
+   * Validates a user's login credentials.
+   * @param email The user's email address.
+   * @param password The user's password.
+   * @returns The validated user object or throws an UnauthorizedException if validation fails.
+   */
+  async validate(email: string, password: string): Promise<{ user: UserDto }> {
+    const credentials: LoginDto = { email, password };
+    const user: UserDto = await this.authService.validateUser(credentials);
     if (!user) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Invalid credentials');
     }
-    // Return the validated user
-    return user;
-  }
 
-  // Asynchronously log in the user
-  async login(email: string, password: string) {
-    const user: LoginDto = { email, password };
-    // Call the authService to log in the user
-    return this.authService.login(user);
+    return { user };
   }
 }
